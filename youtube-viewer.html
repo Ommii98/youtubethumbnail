@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Thumbnail Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 40px 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 30px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 15px;
+      border: 1px solid #767676;
+      box-sizing: border-box;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #000;
+      margin-bottom: 15px;
+    }
+
+    .footer-links {
+      font-size: 12px;
+      color: #000;
+      word-spacing: 10px;
+    }
+
+    .footer-links a {
+      color: #000;
+      text-decoration: underline;
+    }
+
+    /* Thumbnail results */
+    #results {
+      margin-top: 40px;
+    }
+
+    .thumbnail-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 50px;
+    }
+
+    .thumbnail-item img {
+      max-width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .thumbnail-meta {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .url-box {
+      display: flex;
+      align-items: center;
+      background: #f8f8f8;
+      padding: 4px;
+      width: 100%;
+      max-width: 500px;
+      box-sizing: border-box;
+    }
+
+    .url-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      text-align: left;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 5px;
+    }
+    .copy-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Instructions */
+    .instructions {
+      text-align: left;
+      margin: 0 auto 40px auto;
+      max-width: 600px;
+      background: #f9f9f9;
+      padding: 15px 20px;
+      border-left: 4px solid #000;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+    .instructions h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .instructions ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>YouTube Thumbnail Viewer</h1>
+    
+    <div class="instructions">
+      <h3>How to use this tool:</h3>
+      <ul>
+        <li><strong>YouTube Videos:</strong> Paste any standard YouTube URL (e.g., youtube.com/watch?v=...) to instantly fetch high-quality thumbnails.</li>
+        <li><strong>Direct Videos:</strong> Paste a direct video link ending in .mp4, .webm, or .mov to automatically generate a thumbnail frame.</li>
+        <li><strong>Images:</strong> Paste a direct image link (.png, .jpg) to quickly grab and copy the source.</li>
+      </ul>
+    </div>
+
+    <div class="input-group">
+      <label for="ytInput">Enter a YouTube URL or Video ID:</label>
+      <input type="text" id="ytInput" placeholder="Paste YouTube URL or video ID here" autocomplete="off">
+    </div>
+
+    <div id="results"></div>
+
+    <hr>
+    <div class="footer-links">
+      <a href="index.html">ThumbCraft Editor</a>
+      <span>Developed by <strong>Hariom Vishwakarma</strong></span>
+      <a href="#">View source</a>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('ytInput');
+    const results = document.getElementById('results');
+
+    const sizes = [
+      { id: 'default', width: 120 },
+      { id: 'mqdefault', width: 320 },
+      { id: 'hqdefault', width: 480 },
+      { id: 'sddefault', width: 640 },
+      { id: 'maxresdefault', width: 1280 }
+    ];
+
+    function getYTId(url) {
+      const reg = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+      const match = url.match(reg);
+      return match ? match[1] : (url.length === 11 ? url : null);
+    }
+
+    function renderThumbnails(videoId) {
+      results.innerHTML = '';
+      
+      sizes.forEach(size => {
+        const url = `https://img.youtube.com/vi/${videoId}/${size.id}.jpg`;
+        
+        const item = document.createElement('div');
+        item.className = 'thumbnail-item';
+        
+        item.innerHTML = `
+          <img src="${url}" alt="${size.id} thumbnail" onerror="this.parentElement.style.display='none'">
+          <div class="thumbnail-meta">Width: ${size.width}px</div>
+          <div class="url-box">
+            <button class="copy-btn" title="Copy URL" onclick="copyToClipboard('${url}')">
+              📄
+            </button>
+            <input type="text" value="${url}" readonly onclick="this.select()">
+          </div>
+        `;
+        
+        results.appendChild(item);
+      });
+    }
+
+    input.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (!val) {
+        results.innerHTML = '';
+        return;
+      }
+
+      // Check for YouTube
+      const videoId = getYTId(val);
+      if (videoId) {
+        renderThumbnails(videoId);
+        return;
+      }
+
+      // Check if it looks like a direct video link or try to load it
+      if (val.match(/\.(mp4|webm|ogg|mov)$/i)) {
+        renderDirectVideoThumbnail(val);
+      } else if (val.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+        renderImage(val);
+      } else {
+        // We can't definitively tell, but we can try loading as video just in case, or show error
+        results.innerHTML = '<p style="color:red; margin-top: 20px;">Please enter a valid YouTube URL, or a direct image/video link (.mp4, .png, etc.).</p>';
+      }
+    });
+
+    function renderImage(url) {
+      results.innerHTML = '';
+      const item = document.createElement('div');
+      item.className = 'thumbnail-item';
+      item.innerHTML = `
+        <img src="${url}" alt="Image" onerror="this.parentElement.style.display='none'">
+        <div class="thumbnail-meta">Direct Image URL</div>
+        <div class="url-box">
+          <button class="copy-btn" title="Copy URL" onclick="copyToClipboard('${url}')">📄</button>
+          <input type="text" value="${url}" readonly onclick="this.select()">
+        </div>
+      `;
+      results.appendChild(item);
+    }
+
+    function renderDirectVideoThumbnail(url) {
+      results.innerHTML = '<p>Generating thumbnail from video...</p>';
+      const video = document.createElement('video');
+      video.crossOrigin = 'anonymous';
+      video.src = url;
+      video.muted = true;
+      video.playsInline = true;
+      
+      let isLoaded = false;
+      
+      video.addEventListener('loadeddata', () => {
+        if (isLoaded) return;
+        isLoaded = true;
+        // Seek to 1 second or mid-point
+        video.currentTime = Math.min(1, video.duration / 2 || 0);
+      });
+
+      video.addEventListener('seeked', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        results.innerHTML = '';
+        const item = document.createElement('div');
+        item.className = 'thumbnail-item';
+        item.innerHTML = `
+          <img src="${dataUrl}" alt="Generated Video Thumbnail">
+          <div class="thumbnail-meta">Generated from Video (${canvas.width}x${canvas.height}px)</div>
+        `;
+        results.appendChild(item);
+      });
+
+      video.addEventListener('error', () => {
+        results.innerHTML = '<p style="color:red;">Failed to load video. It may be protected by CORS or invalid.</p>';
+      });
+
+      video.load();
+    }
+
+    window.copyToClipboard = function(text) {
+      navigator.clipboard.writeText(text);
+    };
+  </script>
+</body>
+</html>

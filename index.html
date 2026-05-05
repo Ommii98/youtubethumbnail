@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThumbCraft – YouTube Thumbnail Creator</title>
+  <meta name="description" content="Create stunning YouTube thumbnails in seconds. Upload images, add text, apply effects, and download at 1280×720px – all in your browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="6" fill="url(#logoGrad)"/>
+            <path d="M9 8l6 4-6 4V8z" fill="white"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FF416C"/>
+                <stop offset="1" stop-color="#FF4B2B"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start;">
+          <span class="logo-text">ThumbCraft</span>
+          <span style="font-size: 10px; opacity: 0.8; letter-spacing: 0.5px; margin-top: -5px;">BY HARIOM VISHWAKARMA</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="youtube-viewer.html" class="btn-primary" style="margin-right:8px; text-decoration:none;">YT Viewer</a>
+        <button id="btnHelp" class="btn-primary" style="margin-right:8px;">Help</button>
+        <span class="nav-badge">1280 × 720 px</span>
+        <button id="btnDownload" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="app-layout">
+    <!-- Left Sidebar: Tools -->
+    <aside class="sidebar-left">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Background</h3>
+        <div class="bg-options">
+          <button class="tool-btn" id="btnUploadBg" title="Upload Image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Upload Image</span>
+          </button>
+          <input type="file" id="bgUpload" accept="image/*,video/*" hidden />
+          <div id="videoFramesSection" style="display: none; width:100%; margin-top:10px;">
+            <label class="panel-label">Video Frames</label>
+            <div id="videoFramesList" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"></div>
+          </div>
+          <button class="tool-btn active" id="btnSolidBg" title="Solid Color">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" opacity=".2"/><path d="M3 3h18v18H3z" rx="2"/></svg>
+            <span>Solid Color</span>
+          </button>
+          <button class="tool-btn" id="btnGradientBg" title="Gradient">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FF416C"/><stop offset="100%" stop-color="#7B2FFF"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="2" fill="url(#g1)" stroke="none"/></svg>
+            <span>Gradient</span>
+          </button>
+        </div>
+
+<!-- YouTube Thumbnails fetch -->
+<div class="youtube-fetch-section">
+  <input type="text" id="ytUrlInput" placeholder="Enter YouTube URL" class="yt-input" />
+  <button class="tool-btn" id="btnFetchYT" title="Fetch Thumbnails">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Fetch Thumbnails</span>
+  </button>
+  <div id="ytThumbContainer" class="thumb-list hidden"></div>
+</div>
+        <!-- Solid Color Picker -->
+        <div id="solidColorPanel" class="color-panel">
+          <label class="panel-label">Background Color</label>
+          <div class="color-row">
+            <input type="color" id="bgColor" value="#ffffff" class="color-picker" />
+            <span class="color-hex" id="bgColorHex">#ffffff</span>
+          </div>
+        </div>
+
+        <!-- Gradient Panel -->
+        <div id="gradientPanel" class="color-panel hidden">
+          <label class="panel-label">Gradient Colors</label>
+          <div class="color-row">
+            <input type="color" id="gradColor1" value="#FF416C" class="color-picker" />
+            <span class="color-hex">Start</span>
+          </div>
+          <div class="color-row">
+            <input type="color" id="gradColor2" value="#7B2FFF" class="color-picker" />
+            <span class="color-hex">End</span>
+          </div>
+          <div class="range-row">
+            <label class="panel-label">Angle</label>
+            <input type="range" id="gradAngle" min="0" max="360" value="135" class="range-input" />
+            <span id="gradAngleVal">135°</span>
+          </div>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay-section">
+          <label class="panel-label">Image Overlay</label>
+          <div class="range-row">
+            <span>Dark</span>
+            <input type="range" id="overlayOpacity" min="0" max="100" value="30" class="range-input" />
+            <span id="overlayVal">30%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Tools -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Text Elements</h3>
+        <button class="tool-btn-wide" id="btnAddTitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+          Add Title Text
+        </button>
+        <button class="tool-btn-wide" id="btnAddSubtitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 14h10"/></svg>
+          Add Subtitle
+        </button>
+        <button class="tool-btn-wide" id="btnAddBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="8" rx="4"/><circle cx="8" cy="12" r="1" fill="currentColor"/></svg>
+          Add Badge / Label
+        </button>
+      </div>
+
+      <!-- Stickers -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Stickers & Icons</h3>
+        <div class="sticker-grid">
+          <button class="sticker-btn" data-emoji="🔥">🔥</button>
+          <button class="sticker-btn" data-emoji="⚡">⚡</button>
+          <button class="sticker-btn" data-emoji="🎯">🎯</button>
+          <button class="sticker-btn" data-emoji="💥">💥</button>
+          <button class="sticker-btn" data-emoji="🚀">🚀</button>
+          <button class="sticker-btn" data-emoji="👑">👑</button>
+          <button class="sticker-btn" data-emoji="💡">💡</button>
+          <button class="sticker-btn" data-emoji="❤️">❤️</button>
+          <button class="sticker-btn" data-emoji="✅">✅</button>
+          <button class="sticker-btn" data-emoji="⭐">⭐</button>
+          <button class="sticker-btn" data-emoji="🎮">🎮</button>
+          <button class="sticker-btn" data-emoji="💎">💎</button>
+        </div>
+      </div>
+
+      <!-- Shapes -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Shapes</h3>
+        <div class="shape-grid">
+          <button class="shape-btn" id="addRect" title="Rectangle">
+            <svg viewBox="0 0 40 28" fill="none"><rect x="2" y="2" width="36" height="24" rx="3" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button class="shape-btn" id="addCircle" title="Circle">
+            <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button class="shape-btn" id="addTriangle" title="Triangle">
+            <svg viewBox="0 0 40 36" fill="none"><polygon points="20,2 38,34 2,34" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </button>
+          <button class="shape-btn" id="addArrow" title="Arrow Banner">
+            <svg viewBox="0 0 40 28" fill="none"><polygon points="2,4 30,4 38,14 30,24 2,24" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </button>
+        </div>
+        <div class="color-row" style="margin-top:8px">
+          <input type="color" id="shapeColor" value="#FF416C" class="color-picker" />
+          <span class="color-hex">Shape Color</span>
+          <input type="range" id="shapeOpacity" min="10" max="100" value="80" class="range-input" style="flex:1" />
+        </div>
+      </div>
+
+      <!-- Templates -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Quick Templates</h3>
+        <div class="template-grid">
+          <button class="template-btn" data-template="gaming" id="tpl-gaming">
+            <div class="tpl-preview gaming-tpl">
+              <span class="tpl-label">GAMING</span>
+            </div>
+          </button>
+          <button class="template-btn" data-template="tutorial" id="tpl-tutorial">
+            <div class="tpl-preview tutorial-tpl">
+              <span class="tpl-label">TUTORIAL</span>
+            </div>
+          </button>
+          <button class="template-btn" data-template="vlog" id="tpl-vlog">
+            <div class="tpl-preview vlog-tpl">
+              <span class="tpl-label">VLOG</span>
+            </div>
+          </button>
+          <button class="template-btn" data-template="tech" id="tpl-tech">
+            <div class="tpl-preview tech-tpl">
+              <span class="tpl-label">TECH</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Canvas Area -->
+    <section class="canvas-area">
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="thumbCanvas" width="1280" height="720"></canvas>
+
+        <!-- Overlay elements (drag handles rendered on top) -->
+        <div id="elementsOverlay" class="elements-overlay"></div>
+      </div>
+      <div class="canvas-toolbar">
+        <button class="canvas-tool-btn" id="btnUndo" title="Undo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+        </button>
+        <button class="canvas-tool-btn" id="btnRedo" title="Redo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13"/></svg>
+        </button>
+        <div class="separator"></div>
+        <button class="canvas-tool-btn" id="btnClear" title="Clear All">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+        </button>
+        <div class="separator"></div>
+        <span class="zoom-label">Zoom:</span>
+        <button class="canvas-tool-btn" id="btnZoomOut">−</button>
+        <span id="zoomLevel">100%</span>
+        <button class="canvas-tool-btn" id="btnZoomIn">+</button>
+        <button class="canvas-tool-btn" id="btnZoomFit">Fit</button>
+      </div>
+    </section>
+
+    <!-- Right Sidebar: Properties -->
+    <aside class="sidebar-right" id="propertiesPanel">
+      <div class="no-selection" id="noSelectionMsg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" opacity=".3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <p>Select an element on the canvas to edit its properties</p>
+      </div>
+
+      <!-- Text Properties -->
+      <div id="textProperties" class="prop-panel hidden">
+        <h3 class="sidebar-title">Text Properties</h3>
+
+        <label class="prop-label">Content</label>
+        <textarea id="propText" class="prop-textarea" rows="3" placeholder="Enter text..."></textarea>
+
+        <label class="prop-label">Font Family</label>
+        <select id="propFont" class="prop-select">
+          <option value="Outfit">Outfit</option>
+          <option value="Inter">Inter</option>
+          <option value="Arial Black">Arial Black</option>
+          <option value="Impact">Impact</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+
+        <label class="prop-label">Font Size: <span id="propFontSizeVal">72</span>px</label>
+        <input type="range" id="propFontSize" min="12" max="300" value="72" class="range-input" />
+
+        <label class="prop-label">Style</label>
+        <div class="style-row">
+          <button class="style-btn" id="btnBold" data-prop="bold">B</button>
+          <button class="style-btn italic-btn" id="btnItalic" data-prop="italic">I</button>
+          <button class="style-btn" id="btnShadow" data-prop="shadow" title="Text Shadow">S</button>
+          <button class="style-btn" id="btnStroke" data-prop="stroke" title="Text Outline">O</button>
+        </div>
+
+        <label class="prop-label">Alignment</label>
+        <div class="style-row">
+          <button class="style-btn" id="alignLeft" data-align="left">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1H2zm0 3h8v1H2zm0 3h10v1H2z"/></svg>
+          </button>
+          <button class="style-btn active" id="alignCenter" data-align="center">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1H2zm2 3h8v1H4zm-2 3h12v1H2z"/></svg>
+          </button>
+          <button class="style-btn" id="alignRight" data-align="right">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1H2zm4 3h8v1H6zm-4 3h12v1H2z"/></svg>
+          </button>
+        </div>
+
+        <label class="prop-label">Text Color</label>
+        <div class="color-row">
+          <input type="color" id="propTextColor" value="#ffffff" class="color-picker" />
+          <span class="color-hex" id="propTextColorHex">#ffffff</span>
+        </div>
+
+        <label class="prop-label">Stroke Color</label>
+        <div class="color-row">
+          <input type="color" id="propStrokeColor" value="#000000" class="color-picker" />
+          <span class="color-hex" id="propStrokeColorHex">#000000</span>
+        </div>
+
+        <label class="prop-label">Stroke Width: <span id="propStrokeWidthVal">3</span>px</label>
+        <input type="range" id="propStrokeWidth" min="1" max="20" value="3" class="range-input" />
+
+        <label class="prop-label">Opacity: <span id="propOpacityVal">100</span>%</label>
+        <input type="range" id="propOpacity" min="10" max="100" value="100" class="range-input" />
+
+        <label class="prop-label">Rotation: <span id="propRotationVal">0</span>°</label>
+        <input type="range" id="propRotation" min="-180" max="180" value="0" class="range-input" />
+
+        <div class="prop-actions">
+          <button class="prop-btn-danger" id="btnDeleteSelected">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M3 6h18M19 6l-1 14H6L5 6"/></svg>
+            Delete
+          </button>
+          <button class="prop-btn" id="btnDuplicateSelected">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Duplicate
+          </button>
+        </div>
+      </div>
+
+      <!-- Shape Properties -->
+      <div id="shapeProperties" class="prop-panel hidden">
+        <h3 class="sidebar-title">Shape Properties</h3>
+
+        <label class="prop-label">Fill Color</label>
+        <div class="color-row">
+          <input type="color" id="propShapeColor" value="#FF416C" class="color-picker" />
+          <span class="color-hex" id="propShapeColorHex">#FF416C</span>
+        </div>
+
+        <label class="prop-label">Opacity: <span id="propShapeOpacityVal">80</span>%</label>
+        <input type="range" id="propShapeOpacity" min="10" max="100" value="80" class="range-input" />
+
+        <label class="prop-label">Rotation: <span id="propShapeRotationVal">0</span>°</label>
+        <input type="range" id="propShapeRotation" min="-180" max="180" value="0" class="range-input" />
+
+        <div class="prop-actions">
+          <button class="prop-btn-danger" id="btnDeleteShape">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M3 6h18M19 6l-1 14H6L5 6"/></svg>
+            Delete
+          </button>
+          <button class="prop-btn" id="btnDuplicateShape">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Duplicate
+          </button>
+        </div>
+      </div>
+
+      <!-- Emoji Properties -->
+      <div id="emojiProperties" class="prop-panel hidden">
+        <h3 class="sidebar-title">Sticker Properties</h3>
+
+        <label class="prop-label">Size: <span id="propEmojiSizeVal">80</span>px</label>
+        <input type="range" id="propEmojiSize" min="20" max="400" value="80" class="range-input" />
+
+        <label class="prop-label">Opacity: <span id="propEmojiOpacityVal">100</span>%</label>
+        <input type="range" id="propEmojiOpacity" min="10" max="100" value="100" class="range-input" />
+
+        <label class="prop-label">Rotation: <span id="propEmojiRotationVal">0</span>°</label>
+        <input type="range" id="propEmojiRotation" min="-180" max="180" value="0" class="range-input" />
+
+        <div class="prop-actions">
+          <button class="prop-btn-danger" id="btnDeleteEmoji">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><path d="M3 6h18M19 6l-1 14H6L5 6"/></svg>
+            Delete
+          </button>
+          <button class="prop-btn" id="btnDuplicateEmoji">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Duplicate
+          </button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Upload Overlay face image -->
+  <div class="fab-upload" id="fabUploadFace" title="Add face / overlay image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Add Image</span>
+    <input type="file" id="faceUpload" accept="image/*" hidden />
+  </div>
+
+  <!-- Help Panel -->
+  <div id="helpPanel" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center;">
+    <div style="background: #1c1c1c; padding: 30px; border-radius: 12px; width: 500px; max-width: 90%; color: #fff; border: 1px solid #333;">
+      <h2 style="margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;">How to use ThumbCraft</h2>
+      <ul style="line-height: 1.6; padding-left: 20px;">
+        <li><strong>Backgrounds:</strong> Set a solid color, gradient, or upload an image. If you upload a video, it will extract 5 frames automatically so you can pick the best shot!</li>
+        <li><strong>Text & Badges:</strong> Click the text buttons on the left to add text. Click on the text in the canvas to move it around and style it on the right panel.</li>
+        <li><strong>Shapes & Stickers:</strong> Add basic shapes or emojis. Select them to change size, color, and rotation.</li>
+        <li><strong>Upload Image (Face):</strong> Click the floating "Add Image" button at the bottom right to overlay your own photos (like a cutout of your face) onto the canvas.</li>
+        <li><strong>YT Viewer:</strong> Click the "YT Viewer" button in the top navigation to download existing thumbnails from YouTube or grab thumbnails from direct video links.</li>
+      </ul>
+      <button id="btnCloseHelp" class="btn-primary" style="margin-top: 20px; width: 100%;">Got it!</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
