@@ -3,7 +3,8 @@
 Developed by **Hariom Vishwakarma**, ThumbCraft is a powerful, browser-based tool designed to help you create stunning YouTube thumbnails and fetch existing ones with ease.
 
 ## 🚀 Live Demo
-*Coming soon! (Requires Node.js hosting)*
+[https://ommii98.github.io/youtubethumbnail/](https://ommii98.github.io/youtubethumbnail/)
+*(Note: GitHub Pages version is static; for full video analysis features, run locally with Node.js)*
 
 ## ✨ Key Features
 
